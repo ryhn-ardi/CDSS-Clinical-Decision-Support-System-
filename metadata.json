@@ -1,0 +1,8 @@
+{
+  "name": "Clinical Decision Support System (CDSS)",
+  "description": "Aplikasi Offline-First untuk dokter mempermudah penakaran dosis obat secara presisi, tersinkronisasi dengan Supabase.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}
