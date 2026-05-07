@@ -114,7 +114,7 @@ export default function DrugBank() {
       `;
 
       const response = await ai.models.generateContent({
-         model: 'gemini-3.1-pro-preview',
+         model: 'gemini-2.5-flash',
          contents: prompt,
          config: {
             responseMimeType: "application/json"
@@ -126,9 +126,9 @@ export default function DrugBank() {
           const data = JSON.parse(text);
           setLibResult(data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI Search error:", error);
-      alert("Gagal menemukan obat di Library (MIMS). Pastikan nama obat benar atau coba nama generik.");
+      alert(`Gagal menemukan obat di Library (MIMS). Error: ${error?.message || error}`);
     } finally {
       setIsSearchingLib(false);
     }
