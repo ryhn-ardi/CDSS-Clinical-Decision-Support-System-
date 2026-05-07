@@ -4,8 +4,6 @@ import { Plus, Pill, Trash2, Edit2, AlertTriangle, Save, X, Search, Loader2, Boo
 import { GoogleGenAI } from '@google/genai';
 import { cn } from '../lib/utils';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export default function DrugBank() {
   const drugs = useAppStore(state => state.drugs);
   const addDrug = useAppStore(state => state.addDrug);
@@ -84,7 +82,22 @@ export default function DrugBank() {
     setIsSearchingLib(true);
     setLibResult(null);
 
+    // Check AI Studio's injected key first, then fallback to Vite's public env var
+    // Using simple string literal to avoid Vite "process not defined" crashes on standard deployments
+    let apiKey = '';
+    try { apiKey = process.env.GEMINI_API_KEY || ''; } catch(e) {}
+    if (!apiKey) {
+       try { apiKey = import.meta.env.VITE_GEMINI_API_KEY || ''; } catch(e) {}
+    }
+
+    if (!apiKey) {
+       alert("Error: GEMINI_API_KEY atau VITE_GEMINI_API_KEY belum dikonfigurasi pada environment variable.");
+       setIsSearchingLib(false);
+       return;
+    }
+
     try {
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `Cari informasi obat "${libSearchQuery}" berdasarkan referensi MIMS Indonesia.
       Keluarkan format JSON dengan struktur berikut (jangan gunakan markdown block, cukup raw JSON yang start dengan { dan end dengan } dan dapat di-parse dengan JSON.parse):
       {
