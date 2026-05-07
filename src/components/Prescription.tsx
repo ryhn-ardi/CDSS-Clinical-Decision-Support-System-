@@ -6,6 +6,8 @@ import { cn } from '../lib/utils';
 export default function Prescription() {
   const user = useAppStore(state => state.user);
   const drugs = useAppStore(state => state.drugs);
+  const clinicInfo = useAppStore(state => state.clinicInfo);
+  const updateClinicInfo = useAppStore(state => state.updateClinicInfo);
 
   const [patientName, setPatientName] = useState('');
   const [weightKg, setWeightKg] = useState('');
@@ -16,6 +18,8 @@ export default function Prescription() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sig, setSig] = useState('');
   const [amount, setAmount] = useState('');
+
+  const [showClinicSettings, setShowClinicSettings] = useState(false);
 
   // Limit suggestions and don't show if searchQuery is exactly matching a drug name
   const showSuggestions = searchQuery.trim().length > 0 && !drugs.some(d => d.name.toLowerCase() === searchQuery.toLowerCase());
@@ -54,9 +58,51 @@ export default function Prescription() {
             </h2>
             <p className="text-blue-100 mt-1 opacity-90">Cetak resep dalam format PDF dengan mudah.</p>
           </div>
+          <button onClick={() => setShowClinicSettings(!showClinicSettings)} className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            Atur Kop Surat
+          </button>
         </div>
 
         <div className="p-6 md:p-8 space-y-8">
+          {showClinicSettings && (
+             <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 space-y-4">
+                <h3 className="font-bold text-blue-800">Pengaturan Kop Surat</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">Nama Klinik/Praktik</label>
+                      <input 
+                        type="text" value={clinicInfo?.name || ''} onChange={e => updateClinicInfo({ name: e.target.value })}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500"
+                      />
+                   </div>
+                   <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">Alamat Praktik</label>
+                      <input 
+                        type="text" value={clinicInfo?.address || ''} onChange={e => updateClinicInfo({ address: e.target.value })}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500"
+                      />
+                   </div>
+                   <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">Nama Dokter (Gelar)</label>
+                      <input 
+                        type="text" value={clinicInfo?.doctorName || ''} onChange={e => updateClinicInfo({ doctorName: e.target.value })} placeholder={`dr. ${user?.username}`}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500"
+                      />
+                   </div>
+                   <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">SIP</label>
+                      <input 
+                        type="text" value={clinicInfo?.sip || ''} onChange={e => updateClinicInfo({ sip: e.target.value })} placeholder={`${user?.id.substring(0,8)}/SIP/2026`}
+                        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500"
+                      />
+                   </div>
+                </div>
+                <div className="flex justify-end">
+                  <button onClick={() => setShowClinicSettings(false)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold shadow-sm hover:bg-blue-700">Tutup Pengaturan</button>
+                </div>
+             </div>
+          )}
+
           {/* Patient Info */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
              <div className="md:col-span-1 space-y-1">
@@ -228,16 +274,16 @@ export default function Prescription() {
       </div>
 
       {/* Print-only template - Fully visible ONLY when printing, taking over screen */}
-      <div className="hidden print:block fixed inset-0 bg-white text-black z-[100] h-screen w-screen p-12">
-         {/* Kop Surat Header */}
+      <div className="hidden print:block fixed inset-0 bg-white text-black z-[100] h-screen w-screen p-12 relative overflow-hidden">
+         {/* Blank space to clear default printer headers/margins issues if any */}
          <div className="flex justify-between items-end border-b-2 border-black pb-4 mb-6">
             <div>
-               <h1 className="text-2xl font-black uppercase tracking-tight">Klinik & Praktik Mandiri</h1>
-               <p className="font-medium mt-1 text-sm">Jl. Kesehatan No. 123, Kota Medika</p>
+               <h1 className="text-2xl font-black uppercase tracking-tight">{clinicInfo?.name || 'Klinik & Praktik Mandiri'}</h1>
+               <p className="font-medium mt-1 text-sm">{clinicInfo?.address || 'Jl. Kesehatan No. 123, Kota Medika'}</p>
             </div>
             <div className="text-right text-sm">
-               <p className="font-bold text-lg">dr. {user?.username}</p>
-               <p>SIP: {user?.id.substring(0,8)}/SIP/2026</p>
+               <p className="font-bold text-lg">{clinicInfo?.doctorName || `dr. ${user?.username}`}</p>
+               <p>SIP: {clinicInfo?.sip || `${user?.id.substring(0,8)}/SIP/2026`}</p>
             </div>
          </div>
          
@@ -287,7 +333,7 @@ export default function Prescription() {
          {/* Footer Signature */}
          <div className="mt-10 text-right pr-12">
             <p className="mb-16">Tanda Tangan Dokter,</p>
-            <p className="font-bold underline underline-offset-4">dr. {user?.username}</p>
+            <p className="font-bold underline underline-offset-4">{clinicInfo?.doctorName || `dr. ${user?.username}`}</p>
          </div>
       </div>
 

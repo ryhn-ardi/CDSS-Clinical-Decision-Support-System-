@@ -37,9 +37,16 @@ interface AppState {
   auditLogs: AuditLog[];
   isSyncing: boolean;
   lastSyncAt: number | null;
+  clinicInfo: {
+    name: string;
+    address: string;
+    doctorName: string;
+    sip: string;
+  };
   
   setUser: (user: AuthUser | null) => void;
   setTheme: (theme: Theme) => void;
+  updateClinicInfo: (info: Partial<{ name: string; address: string; doctorName: string; sip: string }>) => void;
   addDrug: (drug: Omit<Drug, 'id' | 'updatedAt'>) => void;
   updateDrug: (id: string, drug: Partial<Drug>) => void;
   deleteDrug: (id: string) => void;
@@ -58,6 +65,12 @@ export const useAppStore = create<AppState>()(
       auditLogs: [],
       isSyncing: false,
       lastSyncAt: null,
+      clinicInfo: {
+         name: "Klinik & Praktik Mandiri",
+         address: "Jl. Kesehatan No. 123, Kota Medika",
+         doctorName: "",
+         sip: ""
+      },
 
       setUser: (user) => {
          set({ user });
@@ -66,6 +79,7 @@ export const useAppStore = create<AppState>()(
          }
       },
       setTheme: (theme) => set({ theme }),
+      updateClinicInfo: (info) => set((state) => ({ clinicInfo: { ...state.clinicInfo, ...info } })),
 
       addDrug: (drugConfig) => {
         const id = crypto.randomUUID();

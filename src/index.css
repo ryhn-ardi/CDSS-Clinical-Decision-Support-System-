@@ -77,3 +77,9 @@ body {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+@media print {
+  @page {
+    margin: 0; /* Removing margin hides browser headers/footers */
+  }
+}
