@@ -22,7 +22,8 @@ export default function AuthScreen() {
     setLoading(true);
 
     try {
-      const email = `${username.toLowerCase().trim()}@cdss.local`;
+      const sanitizedUsername = username.toLowerCase().trim().replace(/[^a-z0-9]/g, '.');
+      const email = `${sanitizedUsername}@cdss.com`;
       const password = `${pin}SUPA`; // Append text to ensure complex enough pass and hidden
 
       if (isSupabaseConfigured && supabase) {
@@ -90,7 +91,7 @@ export default function AuthScreen() {
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-slate-700">
-                User ID / NIP / Username
+                Nama Asli / Username
               </label>
               <div className="mt-2 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -104,7 +105,7 @@ export default function AuthScreen() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 h-12 sm:text-sm border-slate-300 rounded-xl bg-slate-50 border"
-                  placeholder="dr_faiz"
+                  placeholder="Misal: Budi Santoso"
                 />
               </div>
             </div>

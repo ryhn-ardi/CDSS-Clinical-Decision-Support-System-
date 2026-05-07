@@ -1,9 +1,67 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  /* You can add custom variables here if needed */
+}
+
+body.dark {
+  --color-slate-50: #0f172a;
+  --color-slate-100: #1e293b;
+  --color-slate-200: #334155;
+  --color-slate-300: #475569;
+  --color-slate-400: #64748b;
+  --color-slate-500: #94a3b8;
+  --color-slate-600: #cbd5e1;
+  --color-slate-700: #e2e8f0;
+  --color-slate-800: #f1f5f9;
+  --color-slate-900: #f8fafc;
+  
+  --color-white: #0f172a;
+  
+  --color-blue-50: #172554;
+  --color-blue-100: #1e3a8a;
+  --color-blue-200: #1d4ed8;
+  --color-blue-600: #3b82f6;
+  --color-blue-700: #60a5fa;
+
+  color: #f1f5f9;
+  background-color: #0f172a;
+}
+
+body.theme-pink {
+  --color-slate-50: #fff5f8;
+  --color-slate-100: #ffe4e8;
+  --color-slate-200: #fecdd3;
+  --color-slate-300: #fda4af;
+  --color-slate-400: #fb7185;
+  --color-slate-500: #f43f5e;
+  --color-slate-600: #e11d48;
+  --color-slate-700: #be123c;
+  --color-slate-800: #9f1239;
+  --color-slate-900: #881337;
+
+  --color-blue-50: #fdf2f8; 
+  --color-blue-100: #fce7f3; 
+  --color-blue-200: #fbcfe8; 
+  --color-blue-300: #f9a8d4; 
+  --color-blue-400: #f472b6; 
+  --color-blue-500: #ec4899; 
+  --color-blue-600: #db2777; 
+  --color-blue-700: #be185d; 
+  --color-blue-800: #9d174d; 
+  --color-blue-900: #831843; 
+  
+  --color-indigo-50: #fdf2f8;
+  --color-indigo-100: #fce7f3;
+  --color-indigo-600: #db2777;
+  --color-indigo-700: #be185d;
 }
 
 body {

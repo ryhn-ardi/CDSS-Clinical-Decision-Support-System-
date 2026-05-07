@@ -5,7 +5,9 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 export interface Drug {
   id: string;
   name: string;
+  category?: string;
   doseMgPerKg: number;
+  doseMgPerKgMax?: number;
   concentrationMg: number;
   volumeMl: number;
   maxDoseMg?: number;
@@ -20,6 +22,8 @@ export interface AuditLog {
   timestamp: number;
 }
 
+export type Theme = 'light' | 'dark' | 'pink';
+
 interface AuthUser {
   id: string;
   username: string;
@@ -27,12 +31,14 @@ interface AuthUser {
 
 interface AppState {
   user: AuthUser | null;
+  theme: Theme;
   drugs: Drug[];
   auditLogs: AuditLog[];
   isSyncing: boolean;
   lastSyncAt: number | null;
   
   setUser: (user: AuthUser | null) => void;
+  setTheme: (theme: Theme) => void;
   addDrug: (drug: Omit<Drug, 'id' | 'updatedAt'>) => void;
   updateDrug: (id: string, drug: Partial<Drug>) => void;
   deleteDrug: (id: string) => void;
@@ -46,12 +52,14 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
+      theme: 'light',
       drugs: [],
       auditLogs: [],
       isSyncing: false,
       lastSyncAt: null,
 
       setUser: (user) => set({ user }),
+      setTheme: (theme) => set({ theme }),
 
       addDrug: (drugConfig) => {
         const id = crypto.randomUUID();
@@ -142,7 +150,9 @@ export const useAppStore = create<AppState>()(
               const parsed: Drug = {
                  id: r.id,
                  name: r.name,
+                 category: r.category,
                  doseMgPerKg: Number(r.dose_mg_per_kg),
+                 doseMgPerKgMax: r.dose_mg_per_kg_max ? Number(r.dose_mg_per_kg_max) : undefined,
                  concentrationMg: Number(r.concentration_mg),
                  volumeMl: Number(r.volume_ml),
                  maxDoseMg: r.max_dose_mg ? Number(r.max_dose_mg) : undefined,
@@ -167,7 +177,9 @@ export const useAppStore = create<AppState>()(
                        id: local.id,
                        user_id: state.user.id,
                        name: local.name,
+                       category: local.category,
                        dose_mg_per_kg: local.doseMgPerKg,
+                       dose_mg_per_kg_max: local.doseMgPerKgMax,
                        concentration_mg: local.concentrationMg,
                        volume_ml: local.volumeMl,
                        max_dose_mg: local.maxDoseMg,
@@ -179,8 +191,12 @@ export const useAppStore = create<AppState>()(
           }
 
           if (toUpload.length > 0) {
-              // Upsert
-              await supabase.from('drugs').upsert(toUpload);
+              // Chunk upsert into batches of 500 to avoid payload limits
+              const chunkSize = 500;
+              for (let i = 0; i < toUpload.length; i += chunkSize) {
+                 const chunk = toUpload.slice(i, i + chunkSize);
+                 await supabase.from('drugs').upsert(chunk);
+              }
           }
 
           // Generate final drugs array

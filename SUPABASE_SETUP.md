@@ -28,7 +28,9 @@ create table public.drugs (
     id uuid default gen_random_uuid() primary key,
     user_id uuid references auth.users not null, -- Mengkaitkan obat dengan dokter tertentu
     name text not null,
+    category text,
     dose_mg_per_kg numeric not null,
+    dose_mg_per_kg_max numeric,
     concentration_mg numeric not null,
     volume_ml numeric not null,
     max_dose_mg numeric,
