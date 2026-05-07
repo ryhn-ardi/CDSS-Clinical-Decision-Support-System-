@@ -4,6 +4,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export interface Drug {
   id: string;
+  user_id?: string;
   name: string;
   category?: string;
   doseMgPerKg: number;
@@ -137,9 +138,11 @@ export const useAppStore = create<AppState>()(
           // For this CDSS app, we sync local -> cloud, and cloud -> local.
           
           // 1. Fetch remote drugs
+          const userId = state.user.id;
           const { data: remoteDrugs, error: fetchErr } = await supabase
             .from('drugs')
-            .select('*');
+            .select('*')
+            .eq('user_id', userId);
 
           if (fetchErr) throw fetchErr;
 
