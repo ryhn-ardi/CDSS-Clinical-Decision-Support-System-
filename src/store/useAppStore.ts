@@ -58,7 +58,12 @@ export const useAppStore = create<AppState>()(
       isSyncing: false,
       lastSyncAt: null,
 
-      setUser: (user) => set({ user }),
+      setUser: (user) => {
+         set({ user });
+         if (user) {
+            get().syncWithCloud();
+         }
+      },
       setTheme: (theme) => set({ theme }),
 
       addDrug: (drugConfig) => {
@@ -113,9 +118,8 @@ export const useAppStore = create<AppState>()(
       },
 
       localLogout: () => {
-         // Clear local data mostly, but depends if we want the data to stay for offline.
-         // Let's clear it on logout to protect data from unauthorized access.
-         set({ user: null, drugs: [], auditLogs: [], lastSyncAt: null });
+         // Clear user, but keep drugs for offline mock usage.
+         set({ user: null });
          if (isSupabaseConfigured && supabase) supabase.auth.signOut();
       },
 

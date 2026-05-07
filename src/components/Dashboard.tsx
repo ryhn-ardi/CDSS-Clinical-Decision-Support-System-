@@ -37,9 +37,16 @@ export default function Dashboard() {
         syncWithCloud();
      }
 
+     const syncInterval = setInterval(() => {
+        if (navigator.onLine) {
+           syncWithCloud();
+        }
+     }, 5000);
+
      return () => {
         window.removeEventListener('online', handleOnline);
         window.removeEventListener('offline', handleOffline);
+        clearInterval(syncInterval);
      };
   }, [syncWithCloud]);
 
